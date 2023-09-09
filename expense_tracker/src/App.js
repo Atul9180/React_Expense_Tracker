@@ -1,6 +1,5 @@
-import "./App.css";
 import React from "react";
-import ExpenseItem from "./components/ExpenseItem";
+import ExpenseList from "./components/ExpenseList";
 
 function App() {
   const expenses = [
@@ -45,7 +44,7 @@ function App() {
     <div className="App">
       <div className="expenseHeader">Expense Tracker</div>
       <br />
-      <ExpenseItem expenses={expenses} />
+      <ExpenseList expenses={expenses} />
     </div>
   );
 }

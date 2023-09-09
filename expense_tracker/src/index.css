@@ -16,3 +16,13 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.expenseHeader {
+  display: flex;
+  justify-content: center;
+  font-size: larger;
+  font-weight: bold;
+  color: whitesmoke;
+  padding: 1rem;
+  background-color: #1a1818;
+}
