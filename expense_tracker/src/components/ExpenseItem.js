@@ -1,42 +1,31 @@
 import "./ExpenseItem.css";
+import React from "react";
 
-const ExpenseItem = () => {
+function ExpenseItem({ expenses }) {
+  // const expenseDate = new Date(2023, 2, 28);
+  // const expenseItemDescription = "Car Insurance";
+  // const expenseItemPrice = 294.67;
+
   return (
     <>
-      <div className="underline text-3xl font-bold">Expense Items Food</div>
-      <br />
-
-      {/* items of expense 1 */}
-      <div className="expense-item">
-        <div className="">March 29th 2023</div>
-        <div className="expense-item__description">
-          <h2>Food </h2>
-          <h2>Lucknow</h2>
-          <div className="expense-item__price">Rs 1000</div>
+      {expenses.map((expense) => (
+        <div className="expense-item" key={expense.expenseId}>
+          <div>
+            <span className="expense-date">
+              {expense.expenseDate.toLocaleDateString()}
+            </span>
+          </div>
+          <div className="expense-item__description">
+            <h2>{expense.expenseItemDescription}</h2>
+            <h2>{expense.locationOfExpenditure}</h2>
+            <div className="expense-item__price">
+              ${expense.expenseItemPrice}
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* items of expense 2 */}
-      <div className="expense-item">
-        <div className="">March 30th 2023</div>
-        <div className="expense-item__description">
-          <h2>Car Insurance </h2>
-          <h2>Lucknow</h2>
-          <div className="expense-item__price">Rs 5000</div>
-        </div>
-      </div>
-
-      {/* items of expense 3 */}
-      <div className="expense-item">
-        <div className="">April 29th 2023</div>
-        <div className="expense-item__description">
-          <h2>College Fee</h2>
-          <h2>Lucknow</h2>
-          <div className="expense-item__price">Rs 70000</div>
-        </div>
-      </div>
+      ))}
     </>
   );
-};
+}
 
 export default ExpenseItem;

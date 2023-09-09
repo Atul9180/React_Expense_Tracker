@@ -2,11 +2,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 3px 8px rgba(39, 38, 38, 0.25);
   padding: 0.5rem;
-  margin: 1rem 0;
+  margin: 1rem 3rem -0.7rem;
   border-radius: 12px;
-  background-color: #4b4b4b;
+  background-color: #8d8a8a;
 }
 
 .expense-item__description {
@@ -19,6 +19,12 @@
   flex: 1;
 }
 
+.expense-date {
+  color: rgb(255, 17, 0);
+  font-size: large;
+  margin-right: 1rem;
+  font-weight: bold;
+}
 .expense-item h2 {
   color: #3a3a3a;
   font-size: 1rem;
