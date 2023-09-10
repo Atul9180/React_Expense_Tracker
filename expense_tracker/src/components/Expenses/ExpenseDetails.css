@@ -2,11 +2,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* box-shadow: 0 3px 8px rgba(39, 38, 38, 0.25); */
   padding: 0.5rem;
   margin: 1rem 3rem -0.7rem;
-  /* border-radius: 12px; */
-  background-color: #494848a2;
+  background-color: #8c8a8a9d;
 }
 
 .expense-item__description {
@@ -23,7 +21,7 @@
   font-size: 1rem;
   flex: 1;
   margin: 0 1rem;
-  color: white;
+  color: rgb(11, 39, 70);
 }
 
 .expense-item__price {
@@ -34,6 +32,10 @@
   border: 1px solid white;
   padding: 0.5rem;
   border-radius: 12px;
+}
+
+.expense-delete {
+  background-color: #f10a0a;
 }
 
 @media (min-width: 580px) {
