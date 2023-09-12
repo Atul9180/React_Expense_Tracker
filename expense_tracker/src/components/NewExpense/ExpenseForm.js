@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import "./ExpenseForm.css";
 
-const ExpenseForm = () => {
+const ExpenseForm = (props) => {
   const [enteredTitle, setEnteredTitle] = useState("");
   const [enteredAmount, setEnteredAmount] = useState("");
+  // const [enteredLocation, setEnteredLocation] = useState("");
   const [enteredDate, setEnteredDate] = useState("");
 
   //const [userInput,setUserInput]=useState({
@@ -19,6 +20,7 @@ const ExpenseForm = () => {
     if (name === "date") setEnteredDate(value);
     else if (name === "title") setEnteredTitle(value);
     else if (name === "amount") setEnteredAmount(value);
+    // else setEnteredLocation(value)
   };
 
   const handleSubmit = (e) => {
@@ -31,13 +33,15 @@ const ExpenseForm = () => {
     const expenseData = {
       title: enteredTitle,
       amount: enteredAmount,
+      // location: enteredLocation,
       date: new Date(enteredDate),
     };
-    console.log(expenseData);
+    props.onSaveExpenseData(expenseData);
 
     setEnteredTitle("");
     setEnteredAmount("");
     setEnteredDate("");
+    // setEnteredLocation("");
     setError("");
   };
 
@@ -64,6 +68,16 @@ const ExpenseForm = () => {
           required
           className="input-group"
         />
+
+        {/* <input
+          type="text"
+          name="location"
+          placeholder="Enter place of expense..."
+          value={enteredLocation}
+          onChange={handleInputChange}
+          required
+          className="input-group"
+        /> */}
 
         <input
           type="date"

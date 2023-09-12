@@ -1,25 +1,24 @@
-import "./ExpenseDetails.css";
+import "./ExpenseItem.css";
 import React, { useState } from "react";
 import ExpenseDate from "./ExpenseDate";
 import Card from "../UI_components/Card"; //custom component
 
-const ExpenseDetails = ({ expense, onDelete }) => {
-  const [expenseAmount, setExpenseAmount] = useState(expense.expenseItemPrice);
+const ExpenseItem = ({ expense, onDelete }) => {
+  const [expenseAmount, setExpenseAmount] = useState(expense.amount);
 
   const changeExpense = () => {
     setExpenseAmount(100);
   };
-
   const deleteHandler = () => {
-    onDelete(expense.expenseId);
+    onDelete(expense.id);
   };
 
   return (
     <Card className="expense-item">
-      <ExpenseDate date={expense.expenseDate} />
+      <ExpenseDate date={expense.date} />
       <div className="expense-item__description">
-        <h2>{expense.expenseItemDescription}</h2>
-        <h2>{expense.locationOfExpenditure}</h2>
+        <h2>{expense.title}</h2>
+        {/* <h2>{expense.location}</h2> */}
         <div className="expense-item__price">Rs. {expenseAmount}</div>
         <div onClick={changeExpense} className="expense-item__price">
           Change Price
@@ -35,4 +34,4 @@ const ExpenseDetails = ({ expense, onDelete }) => {
   );
 };
 
-export default ExpenseDetails;
+export default ExpenseItem;
