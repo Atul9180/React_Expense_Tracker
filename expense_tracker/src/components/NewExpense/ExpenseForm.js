@@ -84,6 +84,7 @@ const ExpenseForm = (props) => {
           name="date"
           value={enteredDate}
           onChange={handleInputChange}
+          max={new Date().toISOString().split("T")[0]}
           required
           className="input-group"
         />

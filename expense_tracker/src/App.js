@@ -35,15 +35,17 @@ const App = () => {
   ]);
 
   const addExpenseHandler = (expense) => {
-    console.log("inside app1: ", expense);
-    setExpenses([...expenses, expense]);
-    console.log("inside app.js 2: ", expenses);
+    // console.log("inside app1: ", expense);
+    setExpenses((prevExpenses) => [...prevExpenses, expense]);
+    // console.log("inside app.js 2: ", expenses);
   };
+
   const deleteExpenseHandler = (expenseId) => {
     setExpenses((prevExpenses) =>
       prevExpenses.filter((expense) => expense.id !== expenseId)
     );
   };
+
   return (
     <div className="App">
       <div className="expenseHeader">Expense Tracker</div>
