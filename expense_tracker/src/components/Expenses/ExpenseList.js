@@ -31,13 +31,6 @@ const ExpenseList = () => {
       locationOfExpenditure: "Lucknow",
       expenseItemPrice: 5000,
     },
-    {
-      expenseId: 5,
-      expenseDate: new Date(2023, 4, 8),
-      expenseItemDescription: "Shopping",
-      locationOfExpenditure: "Delhi",
-      expenseItemPrice: 8000,
-    },
   ]);
 
   const handleDelete = (expenseId) => {

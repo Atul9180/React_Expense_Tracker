@@ -32,10 +32,12 @@
   border: 1px solid white;
   padding: 0.5rem;
   border-radius: 12px;
+  cursor: pointer;
 }
 
 .expense-delete {
   background-color: #f10a0a;
+  cursor: pointer;
 }
 
 @media (min-width: 580px) {

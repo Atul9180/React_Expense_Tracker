@@ -2,38 +2,42 @@ import React, { useState } from "react";
 import "./ExpenseForm.css";
 
 const ExpenseForm = () => {
-  const [formData, setFormData] = useState({
-    expenseTitle: "",
-    expenseAmount: "",
-    expenseDate: "",
-  });
+  const [enteredTitle, setEnteredTitle] = useState("");
+  const [enteredAmount, setEnteredAmount] = useState("");
+  const [enteredDate, setEnteredDate] = useState("");
+
+  //const [userInput,setUserInput]=useState({
+  //   enteredTitle: "",
+  //   enteredAmount: "",
+  //   enteredDate: "",
+  // });
+
   const [error, setError] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    if (name === "date") setEnteredDate(value);
+    else if (name === "title") setEnteredTitle(value);
+    else if (name === "amount") setEnteredAmount(value);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (
-      !formData.expenseTitle ||
-      !formData.expenseAmount ||
-      !formData.expenseDate
-    ) {
+    if (!enteredTitle || !enteredAmount || !enteredDate) {
       setError("All fields are required");
       return;
     }
 
-    const expenseData = { ...formData };
+    const expenseData = {
+      title: enteredTitle,
+      amount: enteredAmount,
+      date: new Date(enteredDate),
+    };
     console.log(expenseData);
 
-    setFormData({
-      expenseTitle: "",
-      expenseAmount: "",
-      expenseDate: "",
-    });
+    setEnteredTitle("");
+    setEnteredAmount("");
+    setEnteredDate("");
     setError("");
   };
 
@@ -42,19 +46,20 @@ const ExpenseForm = () => {
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          name="expenseTitle"
+          name="title"
           placeholder="Enter Title of expense..."
-          value={formData.expenseTitle}
+          value={enteredTitle}
           onChange={handleInputChange}
           required
           className="input-group"
         />
 
         <input
-          type="text"
-          name="expenseAmount"
+          type="number"
+          name="amount"
+          min="0"
           placeholder="Enter Amount of expense..."
-          value={formData.expenseAmount}
+          value={enteredAmount}
           onChange={handleInputChange}
           required
           className="input-group"
@@ -62,8 +67,8 @@ const ExpenseForm = () => {
 
         <input
           type="date"
-          name="expenseDate"
-          value={formData.expenseDate}
+          name="date"
+          value={enteredDate}
           onChange={handleInputChange}
           required
           className="input-group"
