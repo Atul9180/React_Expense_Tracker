@@ -4,12 +4,13 @@ import "./ExpenseForm.css";
 const ExpenseForm = (props) => {
   const [enteredTitle, setEnteredTitle] = useState("");
   const [enteredAmount, setEnteredAmount] = useState("");
-  // const [enteredLocation, setEnteredLocation] = useState("");
+  const [enteredLocation, setEnteredLocation] = useState("");
   const [enteredDate, setEnteredDate] = useState("");
 
   //const [userInput,setUserInput]=useState({
   //   enteredTitle: "",
   //   enteredAmount: "",
+  //   enteredLocation:"",
   //   enteredDate: "",
   // });
 
@@ -20,12 +21,12 @@ const ExpenseForm = (props) => {
     if (name === "date") setEnteredDate(value);
     else if (name === "title") setEnteredTitle(value);
     else if (name === "amount") setEnteredAmount(value);
-    // else setEnteredLocation(value)
+    else setEnteredLocation(value);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!enteredTitle || !enteredAmount || !enteredDate) {
+    if (!enteredTitle || !enteredAmount || !enteredDate || !enteredLocation) {
       setError("All fields are required");
       return;
     }
@@ -33,7 +34,7 @@ const ExpenseForm = (props) => {
     const expenseData = {
       title: enteredTitle,
       amount: enteredAmount,
-      // location: enteredLocation,
+      location: enteredLocation,
       date: new Date(enteredDate),
     };
     props.onSaveExpenseData(expenseData);
@@ -41,7 +42,7 @@ const ExpenseForm = (props) => {
     setEnteredTitle("");
     setEnteredAmount("");
     setEnteredDate("");
-    // setEnteredLocation("");
+    setEnteredLocation("");
     setError("");
   };
 
@@ -69,7 +70,7 @@ const ExpenseForm = (props) => {
           className="input-group"
         />
 
-        {/* <input
+        <input
           type="text"
           name="location"
           placeholder="Enter place of expense..."
@@ -77,7 +78,7 @@ const ExpenseForm = (props) => {
           onChange={handleInputChange}
           required
           className="input-group"
-        /> */}
+        />
 
         <input
           type="date"
