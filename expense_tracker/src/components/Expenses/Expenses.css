@@ -1,16 +1,16 @@
 .expenses {
-  padding: 2rem 0.3rem;
-  background-color: rgb(255 248 248);
+  padding: 2rem 1rem;
+  background-color: rgb(229 158 158 / 64%);
   margin: auto;
   width: auto;
-  max-width: 85%;
-  height: 100%;
+  max-width: 90%;
+  height: -webkit-fill-available;
 }
 .NoExpenseFound {
   display: flex;
   justify-content: center;
   font-family: cursive;
-  font-size: larger;
+  font-size: xx-large;
   margin-top: 3rem;
   color: crimson;
 }

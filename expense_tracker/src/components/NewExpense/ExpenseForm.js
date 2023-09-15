@@ -47,54 +47,67 @@ const ExpenseForm = (props) => {
   };
 
   return (
-    <div className="expenseForm">
-      <form onSubmit={handleSubmit}>
-        <label>Title</label>
-        <input
-          type="text"
-          name="title"
-          placeholder="Enter Title of expense..."
-          value={enteredTitle}
-          onChange={handleInputChange}
-          required
-          className="input-group"
-        />
-        <label>Amount</label>
-        <input
-          type="number"
-          name="amount"
-          min="0"
-          placeholder="Enter Amount of expense..."
-          value={enteredAmount}
-          onChange={handleInputChange}
-          required
-          className="input-group"
-        />
-        <label>Location</label>
-        <input
-          type="text"
-          name="location"
-          placeholder="Enter place of expense..."
-          value={enteredLocation}
-          onChange={handleInputChange}
-          required
-          className="input-group"
-        />
-        <label>Date</label>
-        <input
-          type="date"
-          name="date"
-          value={enteredDate}
-          onChange={handleInputChange}
-          max={new Date().toISOString().split("T")[0]}
-          required
-          className="input-group"
-        />
+    <form onSubmit={handleSubmit}>
+      <div className="new-expense__controls">
+        <div className="new-expense__control">
+          <label>Title</label>
+          <input
+            type="text"
+            name="title"
+            placeholder="Enter Title of expense..."
+            value={enteredTitle}
+            onChange={handleInputChange}
+            required
+            className="input-group"
+          />
+        </div>
 
-        <button type="submit">Add</button>
-        {error && <p className="error">{error}</p>}
-      </form>
-    </div>
+        <div className="new-expense__control">
+          <label>Amount</label>
+          <input
+            type="number"
+            name="amount"
+            min="0"
+            placeholder="Enter Amount of expense..."
+            value={enteredAmount}
+            onChange={handleInputChange}
+            required
+            className="input-group"
+          />
+        </div>
+
+        <div className="new-expense__control">
+          <label>Location</label>
+          <input
+            type="text"
+            name="location"
+            placeholder="Enter place of expense..."
+            value={enteredLocation}
+            onChange={handleInputChange}
+            required
+            className="input-group"
+          />
+        </div>
+
+        <div className="new-expense__control">
+          <label>Date</label>
+          <input
+            type="date"
+            name="date"
+            value={enteredDate}
+            onChange={handleInputChange}
+            max={new Date().toISOString().split("T")[0]}
+            required
+            className="input-group"
+          />
+        </div>
+
+        <div className="new-expense__actions">
+          <button type="submit">Add Expense</button>
+          {error && <p className="error">{error}</p>}
+        </div>
+      </div>
+    </form>
   );
 };
 

@@ -2,5 +2,5 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.315);
   border-radius: 12px;
   border: 0.5px solid blueviolet;
-  background: linear-gradient(45deg, black, transparent);
+  background: linear-gradient(45deg, #1b1919ab, transparent);
 }
