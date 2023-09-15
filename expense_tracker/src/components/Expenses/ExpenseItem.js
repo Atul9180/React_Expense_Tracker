@@ -11,6 +11,7 @@ const ExpenseItem = ({ expense, onDelete }) => {
   return (
     <Card className="expense-item">
       <ExpenseDate date={expense.date} />
+
       <div className="expense-item__description">
         <h2>{expense.title}</h2>
         <h2>Rs. {expense.amount}</h2>
