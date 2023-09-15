@@ -19,25 +19,27 @@ const Expenses = (props) => {
   // Sort expenses by date (latest first)
   filteredExpenses.sort((a, b) => b.date - a.date);
 
+  const totalExpensesAvaible = filteredExpenses.length;
+
+  let expensesContent = <p className="NoExpenseFound">No expense found...</p>;
+
+  if (totalExpensesAvaible > 0) {
+    expensesContent = filteredExpenses.map((expense) => (
+      <ExpenseItem
+        key={expense.id}
+        expense={expense}
+        onDelete={props.deleteExpenseHandler}
+      />
+    ));
+  }
+
   return (
     <>
       <ExpensesFilter
         selected={filteredYear}
         onChangeFilter={filterChangeHandler}
       />
-      {filteredExpenses.length === 0 ? (
-        <p className="NoExpenseFound">
-          No expenses found for the selected year
-        </p>
-      ) : (
-        filteredExpenses.map((expense) => (
-          <ExpenseItem
-            key={expense.id}
-            expense={expense}
-            onDelete={props.deleteExpenseHandler}
-          />
-        ))
-      )}
+      {expensesContent}
     </>
   );
 };
