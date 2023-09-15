@@ -43,7 +43,7 @@ const App = () => {
 
   const addExpenseHandler = (expense) => {
     // console.log("inside app1: ", expense);
-    setExpenses((prevExpenses) => [...prevExpenses, expense]);
+    setExpenses((prevExpenses) => [expense, ...prevExpenses]);
     // console.log("inside app.js 2: ", expenses);
   };
 
