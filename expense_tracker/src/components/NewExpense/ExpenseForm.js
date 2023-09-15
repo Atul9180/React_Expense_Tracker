@@ -49,6 +49,7 @@ const ExpenseForm = (props) => {
   return (
     <div className="expenseForm">
       <form onSubmit={handleSubmit}>
+        <label>Title</label>
         <input
           type="text"
           name="title"
@@ -58,7 +59,7 @@ const ExpenseForm = (props) => {
           required
           className="input-group"
         />
-
+        <label>Amount</label>
         <input
           type="number"
           name="amount"
@@ -69,7 +70,7 @@ const ExpenseForm = (props) => {
           required
           className="input-group"
         />
-
+        <label>Location</label>
         <input
           type="text"
           name="location"
@@ -79,7 +80,7 @@ const ExpenseForm = (props) => {
           required
           className="input-group"
         />
-
+        <label>Date</label>
         <input
           type="date"
           name="date"

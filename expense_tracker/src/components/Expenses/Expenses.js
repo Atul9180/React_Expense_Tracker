@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ExpenseItem from "./ExpenseItem";
 import ExpensesFilter from "./ExpensesFilter";
-// import "./Expenses.css";
+import "./Expenses.css";
 
 const Expenses = (props) => {
   const currYear = new Date().getFullYear().toString();
@@ -16,19 +16,28 @@ const Expenses = (props) => {
     return expense.date.getFullYear().toString() === filteredYear;
   });
 
+  // Sort expenses by date (latest first)
+  filteredExpenses.sort((a, b) => b.date - a.date);
+
   return (
     <>
       <ExpensesFilter
         selected={filteredYear}
         onChangeFilter={filterChangeHandler}
       />
-      {filteredExpenses.map((expense) => (
-        <ExpenseItem
-          key={expense.id}
-          expense={expense}
-          onDelete={props.deleteExpenseHandler}
-        />
-      ))}
+      {filteredExpenses.length === 0 ? (
+        <p className="NoExpenseFound">
+          No expenses found for the selected year
+        </p>
+      ) : (
+        filteredExpenses.map((expense) => (
+          <ExpenseItem
+            key={expense.id}
+            expense={expense}
+            onDelete={props.deleteExpenseHandler}
+          />
+        ))
+      )}
     </>
   );
 };
