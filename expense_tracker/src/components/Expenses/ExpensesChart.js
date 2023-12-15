@@ -2,7 +2,7 @@ import React from "react";
 import Chart from "../Chart/Chart";
 
 const ExpensesChart = (props) => {
-  // we will sum up expenses monthwise & assign here value so taking filtered expenses as prop
+  // objects representing months with initial values(amount) 0
   const chartDataPoints = [
     { label: "Jan", value: 0 },
     { label: "Feb", value: 0 },
@@ -18,10 +18,12 @@ const ExpensesChart = (props) => {
     { label: "Dec", value: 0 },
   ];
 
+  //accumulate the expense amounts for each month
   for (const expense of props.expenses) {
     const expenseMonth = expense.date.getMonth(); //starting jan as 0
     chartDataPoints[expenseMonth].value += expense.amount;
   }
+
   return <Chart dataPoints={chartDataPoints} />;
 };
 
