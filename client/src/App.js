@@ -1,14 +1,15 @@
 import React from "react";
-// import Home from "./components/Home";
-import Signup from "./components/auth/Signup";
+import { BrowserRouter } from "react-router-dom";
+import AppRouter from "./routes/AppRouter";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
-const App = () => {
+export default function App() {
   return (
-    <div className="">
-      <Signup />
-      {/* <Home /> */}
-    </div>
+    <BrowserRouter>
+      <Header />
+      <AppRouter />
+      <Footer />
+    </BrowserRouter>
   );
-};
-
-export default App;
+}
