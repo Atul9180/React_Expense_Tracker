@@ -18,6 +18,10 @@ const Signup = () => {
     confirmPasswordRef.current.value = "";
   };
 
+  const clearError = () => {
+    setSignupError("");
+  };
+
   const handleSignup = async (e) => {
     e.preventDefault();
 
@@ -65,9 +69,17 @@ const Signup = () => {
         minHeight: "100vh",
       }}
     >
-      <Row className="p-4 pt-2 shadow border-rounded">
+      <Row
+        className="p-4 pt-2 shadow border-rounded"
+        style={{ minWidth: "50vw" }}
+      >
         {signupError ? (
-          <h3 className="color-red font-bold">{signupError}</h3>
+          <h3
+            className="w-full text-center"
+            style={{ color: "red", fontWeight: "bold" }}
+          >
+            {signupError}
+          </h3>
         ) : (
           ""
         )}
@@ -76,7 +88,7 @@ const Signup = () => {
             <h2>Sign Up</h2>
             <hr />
           </div>
-          <Form onSubmit={handleSignup}>
+          <Form onSubmit={handleSignup} onFocus={clearError}>
             <Form.Group controlId="userName" className="p-1">
               <Form.Label className="font-weight-bold mb-2">Name</Form.Label>
               <Form.Control

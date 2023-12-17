@@ -30,7 +30,8 @@ export const signUpWithEmailPassword = async (email, password, displayName) => {
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
-      password
+      password,
+      displayName
     );
     const user = userCredential.user;
 
@@ -58,10 +59,13 @@ export const loginWithEmailPassword = async (email, password) => {
     const user = res.user;
     console.log({ user });
 
+    //const res=await getUserDetails(users,user.uid);
+
     const userDetails = {
-      //token: "your_token_here",
+      token: user.accessToken,
       uid: user.uid,
       email: user.email,
+      isEmailVerified: user.emailVerified,
       name: user.displayName,
     };
     // Storing user details in localStorage
