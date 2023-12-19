@@ -86,7 +86,6 @@ export const loginWithEmailPassword = async (email, password) => {
 
 export const logOutUserWithEmailPasword = async () => {
   try {
-    console.log("logout request received");
     await signOut(auth);
 
     console.log("logout req. processed");

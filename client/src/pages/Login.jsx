@@ -1,11 +1,22 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { loginWithEmailPassword } from "../services/authService";
+
+import { useDispatch } from "react-redux";
+import { loginAsyncThunk } from "../redux/authThunk";
+
+import useAuthHook from "../customHooks/useAuthHook";
 
 const Login = () => {
+  const { redirectIfLoggedIn } = useAuthHook();
+
+  useEffect(() => {
+    redirectIfLoggedIn();
+  }, [redirectIfLoggedIn]);
+
   const [loginError, setLoginError] = useState(null);
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const userEmailRef = useRef();
@@ -32,21 +43,33 @@ const Login = () => {
       return;
     }
 
+    // try {
+    //   const result = await loginWithEmailPassword(email, password);
+
+    //   if (!result.success) {
+    //     setLoginError(result.error);
+    //     return;
+    //   }
+    //   console.log("Logged in successfully:", result.user);
+    //   alert("Login Successful!");
+    //   navigate("/");
+
+    //   emptyInputFields();
+    // }
     try {
-      const result = await loginWithEmailPassword(email, password);
+      const result = await dispatch(loginAsyncThunk({ email, password }));
+      if (loginAsyncThunk.fulfilled.match(result)) {
+        console.log("Logged in successfully:", result.payload);
+        alert("Login Successful!");
+        navigate("/");
 
-      if (!result.success) {
-        setLoginError(result.error);
-        return;
+        emptyInputFields();
+      } else {
+        setLoginError(result.error.message || "Login error.");
       }
-      console.log("Logged in successfully:", result.user);
-      alert("Login Successful!");
-      navigate("/");
-
-      emptyInputFields();
     } catch (error) {
       console.error("Login error:", error);
-      alert("Login error. Please try again.");
+      setLoginError("Login error. Please try again.");
     }
   };
 

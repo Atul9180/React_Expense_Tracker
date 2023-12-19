@@ -1,10 +1,22 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { signUpWithEmailPassword } from "../services/authService";
+
+import { useDispatch } from "react-redux";
+import { signupAsyncThunk } from "../redux/authThunk";
+
+import useAuthHook from "../customHooks/useAuthHook";
 
 const Signup = () => {
   const [signupError, setSignupError] = useState("");
+
+  const { redirectIfLoggedIn } = useAuthHook();
+
+  useEffect(() => {
+    redirectIfLoggedIn();
+  }, [redirectIfLoggedIn]);
+
+  const dispatch = useDispatch();
 
   const userNameRef = useRef();
   const userEmailRef = useRef();
@@ -44,15 +56,28 @@ const Signup = () => {
       return;
     }
 
-    try {
-      const result = await signUpWithEmailPassword(email, password, name);
+    // try {
+    //   const result = await signUpWithEmailPassword(email, password, name);
 
-      if (!result.success) {
-        setSignupError(result.error);
-      } else {
-        console.log("Registration successful:", result.user);
-        alert("Registration Successful. Please Login!");
+    //   if (!result.success) {
+    //     setSignupError(result.error);
+    //   } else {
+    //     console.log("Registration successful:", result.user);
+    //     alert("Registration Successful. Please Login!");
+    //     emptyInputFields();
+    //   }
+    // }
+    try {
+      const result = await dispatch(
+        signupAsyncThunk({ email, password, displayName: name })
+      );
+
+      if (signupAsyncThunk.fulfilled.match(result)) {
+        console.log("Registration successful: ", result.payload);
+        alert("Registration successful. Login!");
         emptyInputFields();
+      } else {
+        setSignupError(result.payload?.message || "Server Error during signup");
       }
     } catch (error) {
       console.error("Signup error:", error);

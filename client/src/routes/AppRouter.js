@@ -5,11 +5,14 @@ import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import PageNotFound from "../pages/pageNotFound";
+import useAuthHook from "../customHooks/useAuthHook";
 
 const AppRouter = () => {
+  const res = useAuthHook();
+  console.log(res);
   return (
     <Routes>
-      <Route path="/" exact element={<Home />} />
+      <Route path="/" element={<Home />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/login" element={<Login />} />
 
