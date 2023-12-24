@@ -20,7 +20,7 @@ Efficiently manage your expenses with this React-based expense tracking applicat
 - - **Authentication:** Firebase authentication for secure user login/signup.
 - **Expense Management:** Add, edit, categorize expenses.
 - **Visualization:** Visual representation of expenses via charts.
-- **Data Storage:** Firestore to store expense data securely.
+- **Data Storage:** FireStore to store expense data securely.
 - **UI Components:** PrimeReact components for a sleek interface.
 - **State Management:** Redux Toolkit for efficient state handling.
 - **Notifications:** React Toastify for user-friendly notifications.
@@ -68,7 +68,7 @@ expense-tracker-app/
 │   │   │   └── ...
 │   │   └── ...
 │   │
-│   ├── services/
+│   ├── firebase/
 │   │   ├── firebase.js
 │   │   └── ...
 │   │

@@ -1,20 +1,23 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
-import Home from "../pages/Home";
-import Login from "../pages/Login";
-import Signup from "../pages/Signup";
-import PageNotFound from "../pages/pageNotFound";
-import useAuthHook from "../customHooks/useAuthHook";
+import {
+  Signup,
+  Login,
+  ResetPassword,
+  Home,
+  PageNotFound,
+} from "../pages/index";
 
-const AppRouter = () => {
-  const res = useAuthHook();
-  console.log(res);
+const AppRouter = ({ isLoggedIn }) => {
+  console.log(isLoggedIn);
+
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" exact element={<Home />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/resetpassword" element={<ResetPassword />} />
 
       <Route path="*" element={<PageNotFound />} />
     </Routes>

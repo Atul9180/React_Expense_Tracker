@@ -1,33 +1,86 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "react-bootstrap";
+import { NavLink, useNavigate } from "react-router-dom";
+import { Navbar, Nav, Button, Container } from "react-bootstrap";
 
-import { logoutAsyncThunk } from "../redux/authThunk";
-import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { logOutUserWithEmailPasword } from "../firebase/authService";
 
-const Header = () => {
-  const { user } = useSelector((state) => state?.auth);
-  const isLoggedIn = !!user;
+const Header = ({ isLoggedIn }) => {
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const logoutHandler = async () => {
     try {
-      console.log("logout btn clicked");
-      await dispatch(logoutAsyncThunk()); // Dispatch the logout action
-      console.log("logout response received");
-      navigate("/login");
+      const result = await logOutUserWithEmailPasword();
+      if (result.success) {
+        toast.success("Logged-out successfully!");
+        navigate("/login");
+      } else if (!result.success) {
+        toast.error(result.error);
+      }
     } catch (error) {
-      console.error("Logout error:", error);
+      toast.error(error);
+      console.error("Logout error:", { error });
     }
   };
 
   return (
-    <div className="d-flex w-full bg-red justify-between">
-      <h1>Header</h1>
-      {isLoggedIn && <Button onClick={logoutHandler}>Logut</Button>}
-    </div>
+    <Navbar bg="light" data-bs-theme="light" className="shadow" sticky="top">
+      <Container>
+        <Navbar.Brand className="font-bold">
+          <NavLink
+            to="/"
+            // className={({isActive})=>(isActive?`giveyour style class name here`:"")}
+            style={{
+              textDecoration: "none",
+              fontWeight: "bolder",
+              fontSize: "x-large",
+            }}
+          >
+            Expense tracker
+          </NavLink>
+        </Navbar.Brand>
+        <Navbar.Toggle />
+        <Navbar.Collapse className="justify-content-end">
+          <Nav>
+            {!isLoggedIn && (
+              <>
+                <NavLink
+                  to="/login"
+                  style={{
+                    textDecoration: "none",
+                    fontSize: "large",
+                    fontWeight: "bold",
+                    marginRight: "5px",
+                  }}
+                >
+                  Login
+                </NavLink>
+                <NavLink
+                  className="ml-auto font-bold"
+                  to="/signup"
+                  style={{
+                    marginLeft: "5px",
+                    textDecoration: "none",
+                    fontSize: "large",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Signup
+                </NavLink>
+              </>
+            )}
+
+            {isLoggedIn && (
+              <Button onClick={logoutHandler} className="ml-auto">
+                Logout
+              </Button>
+            )}
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 };
 
