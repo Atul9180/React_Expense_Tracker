@@ -10,13 +10,13 @@ import {
 import { FaGoogle } from "react-icons/fa";
 import Loader from "../components/loader/Loader";
 
-// import { useDispatch } from "react-redux";
-// import { loginAsyncThunk } from "../redux/authThunk";
+import { useDispatch } from "react-redux";
+import { SetActiveUserState } from "../redux/features/userSlice";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
 
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const userEmailRef = useRef();
@@ -27,54 +27,59 @@ const Login = () => {
     passwordRef.current.value = "";
   };
 
-  // signin with email password
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
-    const email = userEmailRef.current.value;
-    const password = passwordRef.current.value;
-
-    if (!email || !password) {
-      toast.error("All fields required.");
-      return;
-    }
-
+  //generic login:
+  const genericSignIn = async (callback) => {
     try {
       setIsLoading(true);
+      const result = await callback();
+      if (result.success) {
+        const {
+          email,
+          accessToken,
+          uid,
+          displayName,
+          emailVerified,
+          photoURL,
+        } = result?.user;
 
-      const result = await loginWithEmailPassword(email, password);
-
-      if (!result.success) {
-        toast.error(result.error);
-        return;
+        dispatch(
+          SetActiveUserState({
+            email,
+            accessToken,
+            uid,
+            displayName,
+            emailVerified,
+            photoURL,
+          })
+        );
+        toast.success("Login Successful!");
+        emptyInputFields();
+        navigate("/");
+      } else {
+        throw new Error(result.error);
       }
-      console.log("Logged in successfully:", result.user);
-      toast.success("Login Successful!");
-      emptyInputFields();
-      navigate("/");
     } catch (error) {
-      toast.error(`Login error. Please try again. ${error}`);
-      console.log(error.message);
+      toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // signin with email password
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const enteredEmail = userEmailRef.current.value;
+    const password = passwordRef.current.value;
+    if (!enteredEmail || !password) {
+      toast.error("All fields required.");
+      return;
+    }
+    await genericSignIn(() => loginWithEmailPassword(enteredEmail, password));
+  };
+
   //signin with google pop up:
   const signInWithGoogle = async () => {
-    try {
-      const result = await loginwithGoogleAccount();
-      if (!result.success) {
-        toast.error(result.error);
-      } else {
-        toast.success("logged in with Google!");
-        console.log(result.user);
-        navigate("/");
-      }
-    } catch (err) {
-      toast.error(err);
-      console.log(err.message);
-    }
+    await genericSignIn(loginwithGoogleAccount);
   };
 
   return (

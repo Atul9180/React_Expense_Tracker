@@ -4,9 +4,23 @@ import { Navbar, Nav, Button, Container } from "react-bootstrap";
 
 import { toast } from "react-toastify";
 import { logOutUserWithEmailPasword } from "../firebase/authService";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  selectedUserIsLoggedIn,
+  selectedUser,
+  setLogOutState,
+} from "../redux/features/userSlice";
 
-const Header = ({ isLoggedIn }) => {
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+// import useSyncedUserState from "../customeHooks/useAuthDetails";
+
+const Header = () => {
+  // const { isLoggedIn } = useSyncedUserState() || false;
+  // const { userName } = useSyncedUserState() || "Guest User";
+  const isLoggedIn = useSelector(selectedUserIsLoggedIn);
+  const user = useSelector(selectedUser);
+  const { userName } = user;
+
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
@@ -14,14 +28,15 @@ const Header = ({ isLoggedIn }) => {
     try {
       const result = await logOutUserWithEmailPasword();
       if (result.success) {
+        dispatch(setLogOutState());
         toast.success("Logged-out successfully!");
         navigate("/login");
-      } else if (!result.success) {
+      } else {
         toast.error(result.error);
       }
     } catch (error) {
       toast.error(error);
-      console.error("Logout error:", { error });
+      console.error("Logout error:", error.message);
     }
   };
 
@@ -44,7 +59,7 @@ const Header = ({ isLoggedIn }) => {
         <Navbar.Toggle />
         <Navbar.Collapse className="justify-content-end">
           <Nav>
-            {!isLoggedIn && (
+            {!isLoggedIn ? (
               <>
                 <NavLink
                   to="/login"
@@ -70,12 +85,23 @@ const Header = ({ isLoggedIn }) => {
                   Signup
                 </NavLink>
               </>
-            )}
+            ) : (
+              <>
+                <div
+                  style={{
+                    fontSize: "large",
+                    fontWeight: "bold",
+                    lineHeight: 2,
+                    marginRight: "10px",
+                  }}
+                >
+                  Hello, {userName}
+                </div>
 
-            {isLoggedIn && (
-              <Button onClick={logoutHandler} className="ml-auto">
-                Logout
-              </Button>
+                <Button onClick={logoutHandler} className="ml-7">
+                  Logout
+                </Button>
+              </>
             )}
           </Nav>
         </Navbar.Collapse>

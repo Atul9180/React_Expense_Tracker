@@ -1,35 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Expenses from "../components/expenses/Expenses";
 
-// import { useSelector } from "react-redux";
+import { useSelector } from "react-redux";
+import {
+  selectedUser,
+  selectedUserIsLoggedIn,
+  selectedUserIsProfileComplete,
+} from "../redux/features/userSlice.js";
 
 const Home = () => {
-  // const { user, loading, error } = useSelector((state) => state.auth);
-  // const { email, name, isEmailVerified } = user;
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const user = useSelector(selectedUser);
+  const { email, uid, userName, emailVerified, photoURL } = user;
+  const isLoggedIn = useSelector(selectedUserIsLoggedIn);
+  const isProfileComplete = useSelector(selectedUserIsProfileComplete);
 
-  useEffect(() => {
-    try {
-      setError(null);
-      setIsLoading(true);
-      const storedUserDetails = JSON.parse(localStorage.getItem("user"));
-      setUser(storedUserDetails);
-      setIsLoading(false);
-    } catch (err) {
-      console.log("Home Error", err);
-      setError(err.message);
-      setIsLoading(false);
-    }
-  }, []);
+  const [isLoading] = useState(false);
+  const [error] = useState(null);
 
   return (
     <>
       <Container className="" style={{ minHeight: "85vh", paddingTop: "4vh" }}>
-        <h1 className="text-center">Add Expense</h1>
+        <div className="p-1 m-2 borderBottom shadow text-center">
+          <h2>Add Expense</h2>
+        </div>
         <br />
         <Expenses />
         <br />
@@ -41,14 +36,21 @@ const Home = () => {
 
         {isLoading && <h2>Loading...</h2>}
         {error && <p>Error: {error}</p>}
-        {user && (
-          <div>
-            <h2 className="font-bold">User Details:</h2>
-            <p>Name: {user.name}</p>
-            <p>Email: {user.email}</p>
-            <p>EmailVerified: {user.isEmailVerified}</p>
-            <p>ProfileUpdated: {user.isProfileUpdated}</p>
+        {isLoggedIn && user ? (
+          <div className="mb-4">
+            <Container className="p-1 m-3 borderBottom shadow text-center">
+              <h2>User Details:</h2>
+            </Container>
+            <h6>Name: {userName}</h6>
+            <h6>PhotoUrl: {photoURL ? photoURL : "not available"}</h6>
+            <h6>Email: {email}</h6>
+            <h6>UserId: {uid}</h6>
+            <h6>UserLoggedIn: {isLoggedIn ? "true" : "false"}</h6>
+            <h6>EmailVerified: {emailVerified ? "true" : "false"}</h6>
+            <h6>ProfileUpdated: {isProfileComplete ? "true" : "false"}</h6>
           </div>
+        ) : (
+          <h3 className="text-center">Error in fetching user data!</h3>
         )}
       </Container>
     </>

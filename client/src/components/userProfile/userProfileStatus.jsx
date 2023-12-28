@@ -1,101 +1,108 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Navbar, Container, Badge } from "react-bootstrap";
 import ProfileForm from "./ProfileForm";
-import { verifyEmail } from "../../utils/authUtils";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import {
+  selectedUser,
+  selectedUserIsLoggedIn,
+  selectedUserIsProfileComplete,
+} from "../../redux/features/userSlice.js";
+
+import { sendEmailVerificationLink } from "../../firebase/authService.js";
 
 const UserProfileStatus = () => {
-  const [user, setUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [timerValue, setTimerValue] = useState(null);
+
+  const user = useSelector(selectedUser);
+  const { emailVerified } = user;
+  const isProfileComplete = useSelector(selectedUserIsProfileComplete);
+  const isLoggedIn = useSelector(selectedUserIsLoggedIn);
 
   const toggleModal = () => setShowModal(!showModal);
 
-  const getUserDataFromLocalStorage = () => {
+  //sending email link:
+  const handleVerifyEmail = async (e) => {
+    e.preventDefault();
     try {
-      setIsLoading(true);
-      const storedUserData = JSON.parse(localStorage.getItem("user"));
-      if (storedUserData) {
-        setError(null);
-        return storedUserData;
-      } else {
-        setError("User data not found");
-      }
+      const res = await sendEmailVerificationLink();
+      if (res.success) {
+        toast.success(res.message);
+        setTimerValue(120000 / 1000);
+
+        // Update UI based on timer expiration
+        const tId = setTimeout(() => {
+          setTimerValue(null); // Show the button again
+        }, 120000);
+
+        return clearTimeout(tId);
+      } else throw new Error(res.message);
     } catch (error) {
-      setError("Error fetching user details");
-    } finally {
-      setIsLoading(false);
+      toast.error(error.message);
     }
   };
 
-  useEffect(() => {
-    const res = getUserDataFromLocalStorage();
-    setUser(res);
-  }, []);
-
+  //email verifiction Badge:
   const renderEmailBadge = () => {
-    if (!user) return null;
-    if (user.isEmailVerified) {
+    if (!isLoggedIn || !user || !emailVerified) {
       return (
-        <Badge pill bg="success" className="p-2 px-3">
-          Email is Verified.
-        </Badge>
-      );
-    } else {
-      return (
-        <Badge
-          pill
-          bg="danger"
-          className="p-2 px-3"
-          type="button"
-          onClick={handleVerifyEmail}
-        >
-          Verify email
-        </Badge>
+        <>
+          {timerValue !== null && (
+            <Badge pill bg="warning" className="p-2 px-3">
+              resend time:
+              {` ${timerValue} sec`}
+            </Badge>
+          )}
+
+          {timerValue === null && (
+            <Badge
+              pill
+              bg="danger"
+              className="p-2 px-3"
+              type="button"
+              onClick={handleVerifyEmail}
+            >
+              Verify email
+            </Badge>
+          )}
+        </>
       );
     }
+    return (
+      <Badge pill bg="success" className="p-2 px-3">
+        Email is Verified.
+      </Badge>
+    );
   };
 
+  //profile updation badge:
   const renderProfileBadge = () => {
-    if (!user) return null;
-    if (!user.isProfileUpdated) {
+    if (!isLoggedIn || !user || !isProfileComplete) {
       return (
         <Badge pill bg="danger" className="p-2 px-3 mx-2">
           Your Profile is Incomplete.
-          <Link onClick={toggleModal}>Complete Now</Link>
-        </Badge>
-      );
-    } else {
-      return (
-        <Badge pill bg="success" className="p-2 px-3 mx-2">
-          Your Profile is Complete.
+          <Link onClick={toggleModal}> Complete Now </Link>
         </Badge>
       );
     }
+    return (
+      <Badge pill bg="success" className="p-2 px-3 mx-2">
+        Your Profile is Complete.
+      </Badge>
+    );
   };
 
-  const handleVerifyEmail = async (e) => {
-    e.preventDefault();
-    await verifyEmail(user.token);
-  };
   return (
     <Navbar className="shadow" style={{ background: "#e8ffff" }}>
       <Container className="d-flex justify-content-center">
-        {isLoading ? (
-          <p>Loading...</p>
-        ) : error ? (
-          <p>Error: {error}</p>
-        ) : (
-          <>
-            <Navbar.Brand>Welcome to Expense Tracker</Navbar.Brand>
-            <Navbar.Toggle />
-            <Navbar.Collapse className="justify-content-end">
-              {renderEmailBadge()}
-              {renderProfileBadge()}
-            </Navbar.Collapse>
-          </>
-        )}
+        <Navbar.Brand>Welcome to Expense Tracker</Navbar.Brand>
+        <Navbar.Toggle />
+        <Navbar.Collapse className="justify-content-end">
+          {renderEmailBadge()}
+          {renderProfileBadge()}
+        </Navbar.Collapse>
 
         <ProfileForm showModal={showModal} toggleModal={toggleModal} />
       </Container>

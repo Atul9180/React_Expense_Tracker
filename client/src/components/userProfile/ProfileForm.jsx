@@ -1,17 +1,26 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Modal, Form, Button } from "react-bootstrap";
-// import { useDispatch, useSelector } from "react-redux";
+import { saveUserProfileData } from "../../firebase/authService.js";
+import Loader from "../loader/Loader";
+import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+
+import {
+  SetProfileUpdateStatus,
+  selectedUser,
+} from "../../redux/features/userSlice";
 // import { saveUserProfileAsyncThunk } from "../../redux/authThunk";
 
 const ProfileForm = ({ showModal, toggleModal }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [, setError] = useState(null);
 
   const nameRef = useRef();
   const imageRef = useRef();
 
-  // const dispatch = useDispatch();
-  // const { user } = useSelector((state) => state?.auth.user);
+  const dispatch = useDispatch();
+  const user = useSelector(selectedUser);
+  const { userName, photoURL, accessToken } = user;
   // console.log(user);
 
   const clearInputs = () => {
@@ -30,17 +39,23 @@ const ProfileForm = ({ showModal, toggleModal }) => {
     try {
       setIsLoading(true);
       console.log(name, imageFile);
-      const result = { name, imageFile };
 
-      if (result) {
+      const result = await saveUserProfileData(accessToken, name, imageFile);
+      console.log(result);
+      if (!result?.success) throw new Error(result.message);
+      else {
+        const { name, profileImage, isProfileUpdated } = result?.user;
         // const data = { ...user, result };
-        // console.log("updated successfully:", data.payload);
-        console.log(result);
+        console.log("updated successfully:", result?.user);
+        toast.success(result?.message);
+        dispatch(
+          SetProfileUpdateStatus({ name, profileImage, isProfileUpdated })
+        );
         clearInputs();
-        toggleModal();
+        //toggleModal();
       }
     } catch (error) {
-      setError(error);
+      toast.error(error.message);
       console.log("Error in updating profile: ", error);
     } finally {
       setIsLoading(false);
@@ -73,15 +88,15 @@ const ProfileForm = ({ showModal, toggleModal }) => {
       </Modal.Header>
 
       <Modal.Body>
-        {error && <p>Error: {error}</p>}
         {isLoading ? (
-          <p>Loading...</p>
+          <Loader />
         ) : (
           <Form onSubmit={handleProfileUpdate}>
             <Form.Group controlId="formName">
               <Form.Label>Name:</Form.Label>
               <Form.Control
                 ref={nameRef}
+                defaultValue={userName}
                 type="text"
                 placeholder="Enter Full name"
                 required
@@ -90,24 +105,24 @@ const ProfileForm = ({ showModal, toggleModal }) => {
 
             <Form.Group controlId="formPhoto" className="mt-2">
               <Form.Label>Photo:</Form.Label>
-              <Form.Control ref={imageRef} type="file" required />
+              <Form.Control
+                ref={imageRef}
+                type="file"
+                defaultValue={photoURL || ""}
+                required
+              />
               <Form.Text className="text-muted">
                 *size should be less than 500kb(png,jpg,jpeg)
               </Form.Text>
             </Form.Group>
 
             <Modal.Footer>
-              {isLoading && <h6>Processing...</h6>}
-              {!isLoading && (
-                <>
-                  <Button type="submit" variant="primary">
-                    Update
-                  </Button>
-                  <Button variant="danger" onClick={toggleModal}>
-                    Close
-                  </Button>
-                </>
-              )}
+              <Button type="submit" variant="primary">
+                Update
+              </Button>
+              <Button variant="danger" onClick={toggleModal}>
+                Close
+              </Button>
             </Modal.Footer>
           </Form>
         )}

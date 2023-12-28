@@ -9,7 +9,7 @@ import {
   GoogleAuthProvider,
   sendEmailVerification,
 } from "firebase/auth";
-import { sendPasswordResetEmail } from "firebase/auth";
+import { sendPasswordResetEmail, updateProfile } from "firebase/auth";
 
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
@@ -25,7 +25,7 @@ export const addUserToFirestore = async (userData) => {
 
     return { success: true, user: userData };
   } catch (error) {
-    console.error("Error adding user to fireStore: ", error.message);
+    //console.error("Error adding user to fireStore: ", error.message);
     return { success: false, error: error.message };
   }
 };
@@ -36,10 +36,10 @@ export const updateUserInFirestore = async (userData) => {
     const userDocRef = doc(fireStore, "users", userData.uid);
 
     await updateDoc(userDocRef, userData);
-    console.log("User updated : ", userData);
+    //console.log("User updated : ", userData);
     return { success: true };
   } catch (error) {
-    console.error("Error updating or creating user: ", error.message);
+    //console.error("Error updating or creating user: ", error.message);
     return { success: false, error: error.message };
   }
 };
@@ -47,27 +47,28 @@ export const updateUserInFirestore = async (userData) => {
 //signup user
 export const signUpWithEmailPassword = async (email, password) => {
   try {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    const user = userCredential?.user;
+    await createUserWithEmailAndPassword(auth, email, password);
+    // const userCredential = await createUserWithEmailAndPassword(
+    //   auth,
+    //   email,
+    //   password
+    // );
+    // const user = userCredential?.user;
 
-    const storeCredentials = {
-      uid: user?.uid,
-      email: user?.email,
-      name: "Guest User",
-      isProfileUpdated: false,
-      createdAt: new Date().toLocaleString(),
-    };
+    // const storeCredentials = {
+    //   uid: user?.uid,
+    //   email: user?.email,
+    //   name: "Guest User",
+    //   isProfileUpdated: false,
+    //   createdAt: new Date().toLocaleString(),
+    // };
 
-    await addUserToFirestore(storeCredentials);
+    // await addUserToFirestore(storeCredentials);
 
-    return { success: true, user: storeCredentials };
+    return { success: true, message: `Registration Successful. Please Login!` };
   } catch (error) {
-    console.error("Error signing up:", error.message);
-    return { success: false, error: error.message };
+    // console.error("Error signing up:", error.message);
+    return { success: false, message: error.message };
   }
 };
 
@@ -93,23 +94,25 @@ export const loginWithEmailPassword = async (email, password) => {
   try {
     const res = await signInWithEmailAndPassword(auth, email, password);
     const user = res.user;
-    console.log({ user });
+    console.log("user after lgoin success: ", user);
 
     // Fetch additional user details from fireStore based on the UID
-    const userDetails = await fetchUserDetails(user.uid);
-
-    if (userDetails) {
-      const formattedDetails = {
-        token: user.accessToken,
-        isEmailVerified: user.emailVerified,
-        isLoggedIn: !!user.accessToken,
-        ...userDetails,
-      };
-
-      localStorage.setItem("user", JSON.stringify(formattedDetails));
-      return { success: true, user: formattedDetails };
-    } else {
-      return { success: false, error: "User details not found" };
+    //const userDetails = await fetchUserDetails(user.uid);
+    if (!!user) {
+      localStorage.setItem("user", JSON.stringify(user));
+      return { success: true, user: user };
+    }
+    // if (userDetails) {
+    //   const formattedDetails = {
+    //     token: user.accessToken,
+    //     isEmailVerified: user.emailVerified,
+    //     isLoggedIn: !!user.accessToken,
+    //     ...userDetails,  };
+    // localStorage.setItem("user", JSON.stringify(formattedDetails));
+    // return { success: true, user: formattedDetails };
+    //}
+    else {
+      throw new Error();
     }
   } catch (error) {
     return { success: false, error: error.message };
@@ -149,40 +152,23 @@ export const sendPasswordResetLinkOnEmail = async (email) => {
 };
 
 //send email verification link:
-export const sendEmailVerificationLink = async (email) => {
+export const sendEmailVerificationLink = async () => {
   try {
-    const res = await sendEmailVerification(auth, email);
-    console.log(res);
-    return { success: true, message: "Email Verification link sent on mail." };
+    const user = auth.currentUser;
+    if (user) {
+      await sendEmailVerification(user);
+      return {
+        success: true,
+        message: "Email Verification link sent on mail.",
+      };
+    } else {
+      return { success: false, message: "User not authenticated." };
+    }
   } catch (error) {
     return { success: false, message: error.message };
   }
 };
 
-// export const createOrUpdateFirebaseUser = async(token, mode)=>{
-//   const userCollectionRef = collection(db, "users");
-//   const userRecord = doc(userCollectionRef, token);
-//   const getUserData = await getDoc(userRecord);
-//   if (!getUserData.exists()) {
-//     // Create a new document for this user with the id as their uid
-//     await setDoc(userRecord, {
-//       createdAt: serverTimestamp(),
-//       updatedAt: serverTimestamp(),
-//       displayName: mode === "google" ? auth.currentUser.displayName : "",
-//       profilePicture: mode === "google" ? auth.currentUser.photoURL : null,
-//       socialMediaHandles:{
-//         google:""
-//         },
-//         email:mode==="google"?auth.currentUser.email:null,
-//         mode
-//         });
-//         } else {
-//           // Update the existing document
-//           await updateDoc(userRecord, {
-//             updatedAt: serverTimestamp()
-//             })
-
-// }
 //logout user:
 export const logOutUserWithEmailPasword = async () => {
   try {
@@ -195,34 +181,49 @@ export const logOutUserWithEmailPasword = async () => {
   }
 };
 
-//save user Profile data:
-export const saveUserProfileData = async ({ name, imageUrl }) => {
+//update user Profile data:
+export const saveUserProfileData = async (accessToken, userName, imageFile) => {
+  console.log(accessToken, userName, { imageFile });
   try {
-    console.log({ name, imageUrl });
-    const fileNameMeta = `${new Date()}${imageUrl}${name}`;
-    console.log("dummyimagename: ", fileNameMeta);
-    const storageRef = ref(fireStorage, `userImages/${fileNameMeta}`);
+    // 1. Upload image to Firebase Storage
+    const storageRef = ref(
+      fireStorage,
+      `profile_images/${accessToken}/${imageFile.name}`
+    );
+    console.log(storageRef);
+    const resbuyte = await uploadBytes(storageRef, imageFile);
+    console.log({ resbuyte });
+    // const fileNameMeta = `${new Date()}${imageUrl}${name}`;
+    // console.log("dummyimagename: ", fileNameMeta);
+    // const storageRef = ref(fireStorage, `userImages/${fileNameMeta}`);
+    // await uploadBytes(storageRef, imageUrl);
 
-    await uploadBytes(storageRef, imageUrl);
+    // 2. Get the image URL from Firebase Storage
     const downloadImageURL = await getDownloadURL(storageRef);
     console.log(downloadImageURL);
+
+    // 3. Update user profile in Firebase Authentication
+    const res = await updateProfile(accessToken, {
+      displayName: userName,
+      profileURL: downloadImageURL,
+    });
+    console.log({ res });
     //update data in FireStore:
     const userData = {
-      name,
+      name: userName,
       profileImage: downloadImageURL,
       isProfileUpdated: true,
     };
-    await updateUserInFirestore(userData);
 
     console.log(userData);
     return {
       success: true,
-      msg: "profile saved successfully!",
+      message: "profile saved successfully!",
       user: userData,
     };
   } catch (error) {
-    console.error("Error in updating profile");
-    return { success: false, error: error.message };
+    //console.error("Error in updating profile");
+    return { success: false, message: error.message };
   }
 };
 

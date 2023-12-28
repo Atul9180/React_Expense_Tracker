@@ -9,9 +9,11 @@ import {
   PageNotFound,
 } from "../pages/index";
 
-const AppRouter = ({ isLoggedIn }) => {
-  console.log(isLoggedIn);
+// import { useSelector } from "react-redux";
+// import { SetActiveUserState,selectedUserIsLoggedIn } from "../redux/features/userSlice";
 
+const AppRouter = () => {
+  // const isLoggedIn = useSelector(selectedUserIsLoggedIn);
   return (
     <Routes>
       <Route path="/" exact element={<Home />} />

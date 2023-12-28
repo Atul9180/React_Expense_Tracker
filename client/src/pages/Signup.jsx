@@ -49,10 +49,9 @@ const Signup = () => {
       const result = await signUpWithEmailPassword(email, password);
 
       if (!result.success) {
-        toast.error(result.error);
+        toast.error(result.message);
       } else {
-        console.log("Registration successful:", result.user);
-        toast.success("Registration Successful. Please Login!");
+        toast.success(result.message);
         emptyInputFields();
         navigate("/login");
       }
@@ -113,7 +112,6 @@ const Signup = () => {
                 placeholder="Confirm Password"
               />
             </Form.Group>
-            {/* {isLoading && <h6 className="w-100 mt-3 mb-2">Processing....</h6>} */}
 
             {isLoading && <Loader />}
 
