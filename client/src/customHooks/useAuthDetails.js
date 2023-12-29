@@ -1,15 +1,34 @@
-import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase/firebaseConfig";
+import { SetActiveUserState } from "../redux/features/userSlice";
+import { setLogOutState } from "../redux/features/userSlice";
+import { useDispatch } from "react-redux";
 
-const useSyncedUserState = () => {
-  const userSelector = useSelector((state) => state.auth);
-  const [userStore, setUserStore] = useState(userSelector);
+const useAuthChangeDetails = () => {
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    setUserStore(userSelector);
-  }, [userSelector]);
+    const listenAuthStateChange = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        dispatch(
+          SetActiveUserState({
+            email: user.email,
+            accessToken: user.accessToken,
+            uid: user.uid,
+            displayName: user.displayName,
+            emailVerified: user.emailVerified,
+            photoURL: user.photoURL,
+          })
+        );
+      } else {
+        dispatch(setLogOutState());
+      }
+    });
+    return () => listenAuthStateChange();
+  }, [dispatch]);
 
-  return userStore;
+  return null;
 };
 
-export default useSyncedUserState;
+export default useAuthChangeDetails;

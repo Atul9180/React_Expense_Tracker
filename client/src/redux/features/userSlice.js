@@ -12,13 +12,13 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     SetActiveUserState: (state, action) => {
-      console.log(action.payload);
       const { email, accessToken, uid, displayName, emailVerified, photoURL } =
         action.payload;
       const userName = displayName || generateUserName(email);
+      const profileUpdate = !!displayName && !!photoURL;
 
       state.isLoggedIn = true;
-      state.isProfileComplete = false;
+      state.isProfileComplete = profileUpdate || false;
 
       state.user = {
         email,
@@ -37,12 +37,10 @@ const userSlice = createSlice({
     },
 
     SetProfileUpdateStatus: (state, action) => {
-      console.log(action.payload);
       const { name, profileImage, isProfileUpdated } = action.payload;
       state.isProfileComplete = isProfileUpdated || true;
       state.user.userName = name;
       state.user.photoURL = profileImage;
-      console.log("state updated");
     },
   },
 });

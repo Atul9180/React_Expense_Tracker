@@ -18,7 +18,7 @@ const Header = () => {
   // const { userName } = useSyncedUserState() || "Guest User";
   const isLoggedIn = useSelector(selectedUserIsLoggedIn);
   const user = useSelector(selectedUser);
-  const { userName } = user;
+  const { userName, photoURL } = user;
 
   const dispatch = useDispatch();
 
@@ -41,7 +41,12 @@ const Header = () => {
   };
 
   return (
-    <Navbar bg="light" data-bs-theme="light" className="shadow" sticky="top">
+    <Navbar
+      bg="light"
+      data-bs-theme="light"
+      className="shadow"
+      style={{ position: "sticky", top: 0, zIndex: 10 }}
+    >
       <Container>
         <Navbar.Brand className="font-bold">
           <NavLink
@@ -87,6 +92,20 @@ const Header = () => {
               </>
             ) : (
               <>
+                <NavLink
+                  to="/expenses"
+                  style={{
+                    textDecoration: "underline",
+                    fontSize: "larger",
+                    fontWeight: "700",
+                    marginRight: "15px",
+                    lineHeight: "2",
+                    color: "black",
+                  }}
+                >
+                  Expenses
+                </NavLink>
+
                 <div
                   style={{
                     fontSize: "large",
@@ -95,12 +114,28 @@ const Header = () => {
                     marginRight: "10px",
                   }}
                 >
+                  {photoURL && (
+                    <img
+                      src={photoURL}
+                      alt="profileimage"
+                      style={{
+                        maxHeight: "40px",
+                        maxWidth: "40px",
+                        borderRadius: "50%",
+                        marginRight: "2px",
+                      }}
+                    />
+                  )}
                   Hello, {userName}
                 </div>
 
-                <Button onClick={logoutHandler} className="ml-7">
+                <div
+                  onClick={logoutHandler}
+                  className="ml-7 btn btn-secondary"
+                  style={{ fontWeight: 900 }}
+                >
                   Logout
-                </Button>
+                </div>
               </>
             )}
           </Nav>

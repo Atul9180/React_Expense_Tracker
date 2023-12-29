@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Modal, Form, Button } from "react-bootstrap";
-import { saveUserProfileData } from "../../firebase/authService.js";
+import { updateUserProfileData } from "../../firebase/authService.js";
 import Loader from "../loader/Loader";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +9,6 @@ import {
   SetProfileUpdateStatus,
   selectedUser,
 } from "../../redux/features/userSlice";
-// import { saveUserProfileAsyncThunk } from "../../redux/authThunk";
 
 const ProfileForm = ({ showModal, toggleModal }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,8 +19,7 @@ const ProfileForm = ({ showModal, toggleModal }) => {
 
   const dispatch = useDispatch();
   const user = useSelector(selectedUser);
-  const { userName, photoURL, accessToken } = user;
-  // console.log(user);
+  const { userName, photoURL } = user;
 
   const clearInputs = () => {
     nameRef.current.value = "";
@@ -38,25 +36,24 @@ const ProfileForm = ({ showModal, toggleModal }) => {
 
     try {
       setIsLoading(true);
-      console.log(name, imageFile);
 
-      const result = await saveUserProfileData(accessToken, name, imageFile);
-      console.log(result);
-      if (!result?.success) throw new Error(result.message);
-      else {
+      const result = await updateUserProfileData(name, imageFile);
+
+      if (result.success && result?.user) {
+        // console.log(result?.user);
         const { name, profileImage, isProfileUpdated } = result?.user;
-        // const data = { ...user, result };
-        console.log("updated successfully:", result?.user);
+
+        // console.log("updated successfully:", result?.user);
         toast.success(result?.message);
         dispatch(
           SetProfileUpdateStatus({ name, profileImage, isProfileUpdated })
         );
         clearInputs();
-        //toggleModal();
-      }
+        toggleModal();
+      } else if (!result?.success) throw new Error(result.message);
     } catch (error) {
       toast.error(error.message);
-      console.log("Error in updating profile: ", error);
+      //console.log("Error in updating profile: ", error.message);
     } finally {
       setIsLoading(false);
     }
@@ -64,7 +61,7 @@ const ProfileForm = ({ showModal, toggleModal }) => {
 
   useEffect(() => {
     try {
-      const storedData = JSON.parse(localStorage.getItem("user"));
+      const storedData = JSON.parse(localStorage.getItem("userProfile"));
       if (storedData) {
         nameRef.current.value = storedData.name || "";
         imageRef.current.value = storedData.profileImage || "";

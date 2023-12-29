@@ -33,11 +33,9 @@ const UserProfileStatus = () => {
         setTimerValue(120000 / 1000);
 
         // Update UI based on timer expiration
-        const tId = setTimeout(() => {
+        setTimeout(() => {
           setTimerValue(null); // Show the button again
         }, 120000);
-
-        return clearTimeout(tId);
       } else throw new Error(res.message);
     } catch (error) {
       toast.error(error.message);

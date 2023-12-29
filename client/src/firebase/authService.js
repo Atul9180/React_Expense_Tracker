@@ -4,43 +4,61 @@ import { collection, setDoc, updateDoc, doc, getDoc } from "firebase/firestore";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut,
   signInWithPopup,
   GoogleAuthProvider,
   sendEmailVerification,
 } from "firebase/auth";
-import { sendPasswordResetEmail, updateProfile } from "firebase/auth";
-
+import { sendPasswordResetEmail, updateProfile, signOut } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 //store sign up user to firebase store:
-export const addUserToFirestore = async (userData) => {
+export const adddataToFirestore = async (data) => {
   try {
     //created collection("users"):
-    const usersCollectionRef = collection(fireStore, "users");
-    // Use the uid from userData as the document ID:
-    const userDocRef = doc(usersCollectionRef, userData.uid);
+    const usersCollectionRef = collection(fireStore, "expenseTracker/expenses");
+    // Use the uid from data as the document ID:
+    const userDocRef = doc(usersCollectionRef, auth?.currentUser?.uid);
     // Set new data in fireStore with the document ID as uid:
-    await setDoc(userDocRef, userData);
+    await setDoc(userDocRef, data);
 
-    return { success: true, user: userData };
+    return { success: true, user: data };
   } catch (error) {
-    //console.error("Error adding user to fireStore: ", error.message);
     return { success: false, error: error.message };
   }
 };
 
 //update the existing collection referenced doc:
-export const updateUserInFirestore = async (userData) => {
+export const updateUserInFirestore = async (Data) => {
   try {
-    const userDocRef = doc(fireStore, "users", userData.uid);
+    const userDocRef = doc(
+      fireStore,
+      "expenseTracker/expenses",
+      auth?.currentUser?.uid
+    );
 
-    await updateDoc(userDocRef, userData);
+    await updateDoc(userDocRef, Data);
     //console.log("User updated : ", userData);
     return { success: true };
   } catch (error) {
     //console.error("Error updating or creating user: ", error.message);
     return { success: false, error: error.message };
+  }
+};
+
+// Fetch user details from fireStore
+export const fetchUserDetails = async (uid) => {
+  try {
+    const userDocRef = doc(fireStore, "users", uid);
+    const userSnapshot = await getDoc(userDocRef);
+
+    if (userSnapshot.exists()) {
+      return userSnapshot.data();
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching user details:", error.message);
+    return null;
   }
 };
 
@@ -72,29 +90,12 @@ export const signUpWithEmailPassword = async (email, password) => {
   }
 };
 
-// Fetch user details from fireStore
-export const fetchUserDetails = async (uid) => {
-  try {
-    const userDocRef = doc(fireStore, "users", uid);
-    const userSnapshot = await getDoc(userDocRef);
-
-    if (userSnapshot.exists()) {
-      return userSnapshot.data();
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.error("Error fetching user details:", error.message);
-    return null;
-  }
-};
-
 //login user and fetch data from store:
 export const loginWithEmailPassword = async (email, password) => {
   try {
     const res = await signInWithEmailAndPassword(auth, email, password);
     const user = res.user;
-    console.log("user after lgoin success: ", user);
+    //console.log("user after lgoin success: ", user);
 
     // Fetch additional user details from fireStore based on the UID
     //const userDetails = await fetchUserDetails(user.uid);
@@ -182,17 +183,17 @@ export const logOutUserWithEmailPasword = async () => {
 };
 
 //update user Profile data:
-export const saveUserProfileData = async (accessToken, userName, imageFile) => {
-  console.log(accessToken, userName, { imageFile });
+export const updateUserProfileData = async (userName, imageFile) => {
   try {
+    const user = auth.currentUser;
+
     // 1. Upload image to Firebase Storage
     const storageRef = ref(
       fireStorage,
-      `profile_images/${accessToken}/${imageFile.name}`
+      `profile_images/${user.uid}${imageFile.name}`
     );
-    console.log(storageRef);
-    const resbuyte = await uploadBytes(storageRef, imageFile);
-    console.log({ resbuyte });
+    await uploadBytes(storageRef, imageFile);
+
     // const fileNameMeta = `${new Date()}${imageUrl}${name}`;
     // console.log("dummyimagename: ", fileNameMeta);
     // const storageRef = ref(fireStorage, `userImages/${fileNameMeta}`);
@@ -200,29 +201,40 @@ export const saveUserProfileData = async (accessToken, userName, imageFile) => {
 
     // 2. Get the image URL from Firebase Storage
     const downloadImageURL = await getDownloadURL(storageRef);
-    console.log(downloadImageURL);
 
     // 3. Update user profile in Firebase Authentication
-    const res = await updateProfile(accessToken, {
+    await updateProfile(user, {
       displayName: userName,
-      profileURL: downloadImageURL,
+      photoURL: downloadImageURL,
     });
-    console.log({ res });
-    //update data in FireStore:
-    const userData = {
-      name: userName,
-      profileImage: downloadImageURL,
-      isProfileUpdated: true,
-    };
 
-    console.log(userData);
+    //if (!res) throw new Error();
+    //update data in FireStore:
+    // const userData = {
+    //   name: userName,
+    //   profileImage: downloadImageURL,
+    //   isProfileUpdated: true,
+    // };
+
+    // console.log(userData);
+    localStorage.setItem(
+      "userProfile",
+      JSON.stringify({
+        name: userName,
+        profileImage: downloadImageURL,
+        isProfileUpdated: true,
+      })
+    );
     return {
       success: true,
-      message: "profile saved successfully!",
-      user: userData,
+      message: "profile updated successfully!",
+      user: {
+        name: userName,
+        profileImage: downloadImageURL,
+        isProfileUpdated: true,
+      },
     };
   } catch (error) {
-    //console.error("Error in updating profile");
     return { success: false, message: error.message };
   }
 };
