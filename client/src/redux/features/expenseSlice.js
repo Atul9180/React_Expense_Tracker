@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  expenses: [],
+  expenses: JSON.parse(localStorage.getItem("expenses")) || [],
   editedExpense: null,
 };
 
@@ -9,7 +9,7 @@ const expenseSlice = createSlice({
   name: "expenseDetail",
   initialState,
   reducers: {
-    getAllExpenses: (state, action) => {
+    setAllExpenses: (state, action) => {
       state.expenses = action.payload;
     },
 
@@ -46,7 +46,7 @@ const expenseSlice = createSlice({
 });
 
 export const {
-  getAllExpenses,
+  setAllExpenses,
   addExpenseToFirebase,
   deleteExpenseItem,
   setEditedExpense,

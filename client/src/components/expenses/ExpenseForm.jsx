@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
+import Loader from "../loader/Loader";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -9,12 +10,17 @@ import {
   selectedEditedExpense,
   updateEditedExpense,
 } from "../../redux/features/expenseSlice";
+import {
+  addExpenseToFirestore,
+  updateExpenseInFirestore,
+} from "../../firebase/authService";
 
 const ExpenseForm = () => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Food");
   const [isEdit, setEdit] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const editedExpense = useSelector(selectedEditedExpense);
 
@@ -31,7 +37,7 @@ const ExpenseForm = () => {
     setCategory("Choose category");
   };
 
-  const handleFormSubmit = (event) => {
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
 
     const expense = {
@@ -47,29 +53,36 @@ const ExpenseForm = () => {
       return;
     }
 
+    setIsLoading(true);
     if (isEdit) {
       try {
-        // console.log("updating expense:", expense);
-
-        dispatch(updateEditedExpense({ ...expense }));
-        toast.success("Expense updated successfully");
-        setEdit(false);
-        clearInputs();
+        const res = await updateExpenseInFirestore(editedExpense?.id, expense);
+        if (res.success) {
+          dispatch(updateEditedExpense({ ...expense }));
+          toast.success("Expense updated successfully");
+          setEdit(false);
+          clearInputs();
+        } else throw new Error(res.error);
       } catch (error) {
         toast.error(error.message);
       }
     } else {
       try {
-        toast.success("Expense added successfully");
-        dispatch(addExpenseToFirebase({ ...expense }));
-        clearInputs();
+        const result = await addExpenseToFirestore(expense);
+        if (result.success) {
+          toast.success("Expense added successfully");
+          dispatch(addExpenseToFirebase({ ...expense }));
+          clearInputs();
+        } else throw new Error(result.error);
       } catch (error) {
         toast.error(error.message);
       }
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
+    setIsLoading(true);
     if (editedExpense !== null) {
       const { amount, description, category, isEdit } = editedExpense;
       setAmount(amount);
@@ -77,11 +90,12 @@ const ExpenseForm = () => {
       setCategory(category);
       setEdit(isEdit);
     }
+    setIsLoading(false);
   }, [editedExpense]);
 
   return (
-    <div className="shadow rounded pt-2 pb-2 mb-6">
-      <div className="pt-1 pb-1 mb-4 borderBottom shadow text-center rounded flex">
+    <div className="shadow rounded p-1 mb-4">
+      <div className="p-2 mb-3 borderBottom shadow text-center rounded flex">
         <h2>Add Expense</h2>
       </div>
 
@@ -132,12 +146,12 @@ const ExpenseForm = () => {
           </Form.Group>
         </Row>
 
-        <Row className="justify-content-center mb-2">
+        <Row className="justify-content-center mb-1">
           <Col md="5">
             <Button
               type="submit"
               variant="primary"
-              className="wave-effect mt-3 w-100 w-sm-auto w-md-70 w-lg-50"
+              className="wave-effect mt-2 w-100 w-sm-auto w-md-70 w-lg-50"
               style={{ fontWeight: "bold" }}
             >
               Submit
@@ -145,6 +159,7 @@ const ExpenseForm = () => {
           </Col>
         </Row>
       </Form>
+      {isLoading && <Loader />}
     </div>
   );
 };

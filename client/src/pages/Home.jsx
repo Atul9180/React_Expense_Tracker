@@ -1,5 +1,4 @@
 import React from "react";
-import { Container } from "react-bootstrap";
 
 import { UserProfileDetails } from "../components/index.js";
 
@@ -11,13 +10,11 @@ const Home = () => {
 
   return (
     <>
-      <Container className="" style={{ minHeight: "85vh", paddingTop: "4vh" }}>
-        {isLoggedIn && <UserProfileDetails />}
+      {isLoggedIn && <UserProfileDetails />}
 
-        {!isLoggedIn && (
-          <h3 className="text-center">Error in fetching user data!</h3>
-        )}
-      </Container>
+      {!isLoggedIn && (
+        <h3 className="text-center">Error in fetching user data!</h3>
+      )}
     </>
   );
 };

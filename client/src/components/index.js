@@ -7,6 +7,4 @@ export { default as UserProfileStatus } from "./userProfile/userProfileStatus.js
 export { default as UserProfileDetails } from "./userProfile/UserProfileDetails.jsx";
 //expense:
 export { default as ExpenseForm } from "./expenses/ExpenseForm.jsx";
-export { default as Expense } from "./expenses/Expenses.jsx";
-export { default as SingleExpense } from "./expenses/SingleExpense.jsx";
 export { default as ExpensesList } from "./expenses/ExpensesList.jsx";

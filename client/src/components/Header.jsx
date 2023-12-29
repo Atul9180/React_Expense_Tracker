@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Navbar, Nav, Button, Container } from "react-bootstrap";
+import { Navbar, Nav, Container } from "react-bootstrap";
 
 import { toast } from "react-toastify";
 import { logOutUserWithEmailPasword } from "../firebase/authService";
@@ -10,12 +10,9 @@ import {
   selectedUser,
   setLogOutState,
 } from "../redux/features/userSlice";
-
-// import useSyncedUserState from "../customeHooks/useAuthDetails";
+import { clearEditedExpense } from "../redux/features/expenseSlice.js";
 
 const Header = () => {
-  // const { isLoggedIn } = useSyncedUserState() || false;
-  // const { userName } = useSyncedUserState() || "Guest User";
   const isLoggedIn = useSelector(selectedUserIsLoggedIn);
   const user = useSelector(selectedUser);
   const { userName, photoURL } = user;
@@ -29,6 +26,7 @@ const Header = () => {
       const result = await logOutUserWithEmailPasword();
       if (result.success) {
         dispatch(setLogOutState());
+        dispatch(clearEditedExpense());
         toast.success("Logged-out successfully!");
         navigate("/login");
       } else {

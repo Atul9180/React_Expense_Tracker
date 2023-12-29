@@ -1,6 +1,14 @@
 import { auth, fireStore, fireStorage } from "./firebaseConfig";
 
-import { collection, setDoc, updateDoc, doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  setDoc,
+  updateDoc,
+  doc,
+  getDoc,
+  deleteDoc,
+  getDocs,
+} from "firebase/firestore";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -10,6 +18,77 @@ import {
 } from "firebase/auth";
 import { sendPasswordResetEmail, updateProfile, signOut } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+//adding expense to firestore:
+export const addExpenseToFirestore = async (expenseData) => {
+  try {
+    const expensesCollectionRef = collection(
+      fireStore,
+      `expenseTracker/expenses/${auth.currentUser.uid}`
+    );
+    const expenseDocRef = doc(expensesCollectionRef, expenseData.id);
+    await setDoc(expenseDocRef, expenseData);
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+};
+
+//update expense:
+export const updateExpenseInFirestore = async (
+  expenseId,
+  updatedExpenseData
+) => {
+  try {
+    const expenseDocRef = doc(
+      fireStore,
+      `expenseTracker/expenses/${auth.currentUser.uid}`,
+      expenseId
+    );
+    await updateDoc(expenseDocRef, updatedExpenseData);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+//fetch exxpenses:
+export const fetchAllExpensesFromFirestore = async () => {
+  try {
+    const user = auth.currentUser;
+    const expensesCollectionRef = collection(
+      fireStore,
+      `expenseTracker/expenses/${user.uid}`
+    );
+
+    const snapshot = await getDocs(expensesCollectionRef);
+
+    const expenses = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return { success: true, expenses: expenses };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+//deleteExpenses:
+export const deleteExpenseFromFirestore = async (expenseId) => {
+  try {
+    const user = auth.currentUser;
+    const expenseRef = doc(
+      fireStore,
+      `expenseTracker/expenses/${user.uid}`,
+      expenseId
+    );
+    await deleteDoc(expenseRef);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
 
 //store sign up user to firebase store:
 export const adddataToFirestore = async (data) => {
@@ -37,6 +116,7 @@ export const updateUserInFirestore = async (Data) => {
     );
 
     await updateDoc(userDocRef, Data);
+    localStorage.setItem("userProfile", JSON.stringify(Data));
     //console.log("User updated : ", userData);
     return { success: true };
   } catch (error) {
@@ -175,6 +255,8 @@ export const logOutUserWithEmailPasword = async () => {
   try {
     await signOut(auth);
     localStorage.removeItem("user");
+    localStorage.removeItem("userProfile");
+    localStorage.removeItem("expenses");
     return { success: true };
   } catch (error) {
     console.error("Error logging out:", error.message);

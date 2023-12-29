@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FaHome, FaPhoneSquareAlt } from "react-icons/fa";
+import { FaHome } from "react-icons/fa";
 
 const PageNotFound = () => {
   const navigate = useNavigate();
@@ -9,9 +9,9 @@ const PageNotFound = () => {
     navigate("/");
   };
 
-  const handleContact = () => {
-    navigate("/");
-  };
+  // const handleContact = () => {
+  //   navigate("/");
+  // };
 
   return (
     <div className="d-flex flex-column justify-content-center align-items-center bg-black text-white vh-100">
@@ -25,13 +25,13 @@ const PageNotFound = () => {
         >
           <FaHome /> Home
         </button>
-        <button
+        {/* <button
           className="btn border mx-3 font-size-btn"
           onClick={handleContact}
           style={{ fontSize: "20px", fontWeight: "bold" }}
         >
           <FaPhoneSquareAlt /> Contact
-        </button>
+        </button> */}
       </div>
     </div>
   );

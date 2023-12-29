@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import {
   Signup,
@@ -10,20 +10,29 @@ import {
   Expenses,
 } from "../pages/index";
 
-// import { useSelector } from "react-redux";
-// import { SetActiveUserState,selectedUserIsLoggedIn } from "../redux/features/userSlice";
+import { useSelector } from "react-redux";
+import { selectedUserIsLoggedIn } from "../redux/features/userSlice";
 
 const AppRouter = () => {
-  // const isLoggedIn = useSelector(selectedUserIsLoggedIn);
+  const isLoggedIn = useSelector(selectedUserIsLoggedIn);
+
   return (
     <Routes>
-      <Route path="/" exact element={<Home />} />
-      <Route path="/expenses" element={<Expenses />} />
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/resetpassword" element={<ResetPassword />} />
+      {!isLoggedIn && <Route path="/" element={<Navigate to="/login" />} />}
+      {!isLoggedIn && (
+        <Route path="/expenses" element={<Navigate to="/login" />} />
+      )}
+      {!isLoggedIn && <Route path="/login" element={<Login />} />}
+      {!isLoggedIn && <Route path="/signup" element={<Signup />} />}
+      {!isLoggedIn && (
+        <Route path="/resetpassword" element={<ResetPassword />} />
+      )}
 
-      <Route path="*" element={<PageNotFound />} />
+      {isLoggedIn && <Route path="/" element={<Home />} />}
+
+      {isLoggedIn && <Route path="/expenses" element={<Expenses />} />}
+      {!isLoggedIn && <Route path="*" element={<Navigate to="/login" />} />}
+      {isLoggedIn && <Route path="*" element={<PageNotFound />} />}
     </Routes>
   );
 };
