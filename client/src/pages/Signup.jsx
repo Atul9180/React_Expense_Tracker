@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -6,41 +6,33 @@ import { toast } from "react-toastify";
 import Loader from "../components/loader/Loader";
 import { signUpWithEmailPassword } from "../firebase/authService";
 
-// import { useDispatch } from "react-redux";
-// import { signupAsyncThunk } from "../redux/authThunk";
-
 const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const navigate = useNavigate();
-  // const dispatch = useDispatch();
-
-  const userEmailRef = useRef();
-  const passwordRef = useRef();
-  const confirmPasswordRef = useRef();
 
   const emptyInputFields = () => {
-    userEmailRef.current.value = "";
-    passwordRef.current.value = "";
-    confirmPasswordRef.current.value = "";
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
   };
 
   const handleSignup = async (e) => {
     e.preventDefault();
 
-    const email = userEmailRef.current.value;
-    const password = passwordRef.current.value;
-
-    if (!email || !password || !confirmPasswordRef.current.value) {
+    if (!email || !password || !confirmPassword) {
       toast.error("All fields are required.");
       return;
     }
-    if (passwordRef.current.value.length <= 4) {
+    if (password.length <= 4) {
       toast.error("Password should have at least 5 characters!");
       return;
     }
-    if (passwordRef.current.value !== confirmPasswordRef.current.value) {
-      toast.error("Password and confirm_Password do not match");
+    if (password !== confirmPassword) {
+      toast.error("Password and Confirm Password do not match");
       return;
     }
 
@@ -84,9 +76,10 @@ const Signup = () => {
             <Form.Group controlId="email" className="p-1">
               <Form.Label className="font-weight-bold mb-1">Email</Form.Label>
               <Form.Control
-                ref={userEmailRef}
                 type="email"
                 placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </Form.Group>
 
@@ -95,9 +88,10 @@ const Signup = () => {
                 Password
               </Form.Label>
               <Form.Control
-                ref={passwordRef}
                 type="password"
                 placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </Form.Group>
 
@@ -106,9 +100,10 @@ const Signup = () => {
                 Confirm Password
               </Form.Label>
               <Form.Control
-                ref={confirmPasswordRef}
                 type="password"
                 placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
             </Form.Group>
 
@@ -125,7 +120,7 @@ const Signup = () => {
                   color: "gray",
                 }}
               >
-                Already have a account?{" "}
+                Already have an account?{" "}
                 <Link to="/login" style={{ color: "black" }}>
                   Login
                 </Link>

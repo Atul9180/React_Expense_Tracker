@@ -10,16 +10,26 @@ import {
   selectedUser,
   setLogOutState,
 } from "../redux/features/userSlice";
-import { clearEditedExpense } from "../redux/features/expenseSlice.js";
+import { selectTheme, toggleTheme } from "../redux/features/themeSlice.js";
+import {
+  clearEditedExpense,
+  selectIsPremiumMember,
+} from "../redux/features/expenseSlice.js";
 
 const Header = () => {
   const isLoggedIn = useSelector(selectedUserIsLoggedIn);
+  const isDarkMode = useSelector(selectTheme);
+  const isPremiumMember = useSelector(selectIsPremiumMember);
   const user = useSelector(selectedUser);
   const { userName, photoURL } = user;
 
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
+
+  const handleTheme = () => {
+    dispatch(toggleTheme());
+  };
 
   const logoutHandler = async () => {
     try {
@@ -40,9 +50,12 @@ const Header = () => {
 
   return (
     <Navbar
-      bg="light"
+      className={
+        isDarkMode ? "bg-dark text-light shadow" : "bg-light text-dark shadow"
+      }
+      // bg={isDarkMode ? "dark" : "light"}
       data-bs-theme="light"
-      className="shadow"
+      // className="shadow"
       style={{ position: "sticky", top: 0, zIndex: 10 }}
     >
       <Container>
@@ -98,7 +111,7 @@ const Header = () => {
                     fontWeight: "700",
                     marginRight: "15px",
                     lineHeight: "2",
-                    color: "black",
+                    // color: "black",
                   }}
                 >
                   Expenses
@@ -126,6 +139,18 @@ const Header = () => {
                   )}
                   Hello, {userName}
                 </div>
+
+                {/* toggle btn  */}
+                {isPremiumMember && (
+                  <div
+                    className="border p-2 mx-2 hover:bg-green-500 hover:text-white"
+                    onClick={handleTheme}
+                    style={{ cursor: "pointer", color: "black" }}
+                  >
+                    Toggle
+                  </div>
+                )}
+                {/* toggle btn  */}
 
                 <div
                   onClick={logoutHandler}

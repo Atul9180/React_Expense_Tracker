@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Form, Button } from "react-bootstrap";
 import { updateUserProfileData } from "../../firebase/authService.js";
 import Loader from "../loader/Loader";
@@ -12,25 +12,20 @@ import {
 
 const ProfileForm = ({ showModal, toggleModal }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [, setError] = useState(null);
-
-  const nameRef = useRef();
-  const imageRef = useRef();
+  const [name, setName] = useState("");
+  const [imageFile, setImageFile] = useState(null);
 
   const dispatch = useDispatch();
   const user = useSelector(selectedUser);
   const { userName, photoURL } = user;
 
   const clearInputs = () => {
-    nameRef.current.value = "";
-    imageRef.current.value = "";
+    setName("");
+    setImageFile(null);
   };
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
-
-    const name = nameRef.current.value.trim();
-    const imageFile = imageRef.current.files[0];
 
     if (!name || !imageFile) return;
 
@@ -40,10 +35,7 @@ const ProfileForm = ({ showModal, toggleModal }) => {
       const result = await updateUserProfileData(name, imageFile);
 
       if (result.success && result?.user) {
-        // console.log(result?.user);
         const { name, profileImage, isProfileUpdated } = result?.user;
-
-        // console.log("updated successfully:", result?.user);
         toast.success(result?.message);
         dispatch(
           SetProfileUpdateStatus({ name, profileImage, isProfileUpdated })
@@ -53,47 +45,39 @@ const ProfileForm = ({ showModal, toggleModal }) => {
       } else if (!result?.success) throw new Error(result.message);
     } catch (error) {
       toast.error(error.message);
-      //console.log("Error in updating profile: ", error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    try {
-      const storedData = JSON.parse(localStorage.getItem("userProfile"));
-      if (storedData) {
-        nameRef.current.value = storedData.name || "";
-        imageRef.current.value = storedData.profileImage || "";
-      }
-    } catch (error) {
-      setError("Error fetching user details");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    if (userName) setName(userName || "");
+    if (photoURL) setImageFile(photoURL || null);
+  }, [userName, photoURL]);
 
   return (
-    <Modal
-      show={showModal}
-      onHide={toggleModal}
-      backdrop="static"
-      keyboard={false}
-    >
-      <Modal.Header closeButton>
-        <Modal.Title>Update your Profile</Modal.Title>
-      </Modal.Header>
+    <>
+      {isLoading && <Loader />}
+      <Modal
+        show={showModal}
+        onHide={toggleModal}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Update your Profile</Modal.Title>
+        </Modal.Header>
 
-      <Modal.Body>
-        {isLoading ? (
+        <Modal.Body>
+          {/* {isLoading ? (
           <Loader />
-        ) : (
+        ) : ( */}
           <Form onSubmit={handleProfileUpdate}>
             <Form.Group controlId="formName">
               <Form.Label>Name:</Form.Label>
               <Form.Control
-                ref={nameRef}
-                defaultValue={userName}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 type="text"
                 placeholder="Enter Full name"
                 required
@@ -103,9 +87,8 @@ const ProfileForm = ({ showModal, toggleModal }) => {
             <Form.Group controlId="formPhoto" className="mt-2">
               <Form.Label>Photo:</Form.Label>
               <Form.Control
-                ref={imageRef}
                 type="file"
-                defaultValue={photoURL || ""}
+                onChange={(e) => setImageFile(e.target.files[0])}
                 required
               />
               <Form.Text className="text-muted">
@@ -122,9 +105,9 @@ const ProfileForm = ({ showModal, toggleModal }) => {
               </Button>
             </Modal.Footer>
           </Form>
-        )}
-      </Modal.Body>
-    </Modal>
+        </Modal.Body>
+      </Modal>
+    </>
   );
 };
 

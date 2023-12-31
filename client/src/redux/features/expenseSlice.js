@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   expenses: JSON.parse(localStorage.getItem("expenses")) || [],
   editedExpense: null,
+  isPremiumMember: false,
 };
 
 const expenseSlice = createSlice({
@@ -42,6 +43,10 @@ const expenseSlice = createSlice({
     clearEditedExpense: (state) => {
       state.editedExpense = null;
     },
+
+    setPremiumMembership: (state, action) => {
+      state.isPremiumMember = action.payload;
+    },
   },
 });
 
@@ -52,10 +57,13 @@ export const {
   setEditedExpense,
   updateEditedExpense,
   clearEditedExpense,
+  setPremiumMembership,
 } = expenseSlice.actions;
 
 export const selectedExpenses = (state) => state.expenseDetail.expenses;
 export const selectedEditedExpense = (state) =>
   state.expenseDetail.editedExpense;
+export const selectIsPremiumMember = (state) =>
+  state.expenseDetail.isPremiumMember;
 
 export default expenseSlice.reducer;

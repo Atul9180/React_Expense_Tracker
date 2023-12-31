@@ -86,8 +86,8 @@ const UserProfileStatus = () => {
       );
     }
     return (
-      <Badge pill bg="success" className="p-2 px-3 mx-2">
-        Your Profile is Complete.
+      <Badge pill bg="success" className="p-2 px-2 mx-2">
+        Profile is Complete.<Link onClick={toggleModal}> Update Now</Link>
       </Badge>
     );
   };

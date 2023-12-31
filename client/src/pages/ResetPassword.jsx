@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Form, Container, Row, Col } from "react-bootstrap";
 import { toast } from "react-toastify";
@@ -8,15 +8,10 @@ import { sendPasswordResetLinkOnEmail } from "../firebase/authService";
 
 const ResetPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
-
-  // const dispatch = useDispatch();
-
-  const userEmailRef = useRef();
+  const [email, setEmail] = useState("");
 
   const handlePasswordReset = async (e) => {
     e.preventDefault();
-
-    const email = userEmailRef.current.value;
 
     if (!email) {
       toast.error("Email field required.");
@@ -32,7 +27,7 @@ const ResetPassword = () => {
         return;
       } else {
         toast.success(result.message);
-        userEmailRef.current.value = "";
+        setEmail(""); // Clearing the email field after success
       }
     } catch (error) {
       toast.error(error.message);
@@ -63,9 +58,10 @@ const ResetPassword = () => {
             <Form.Group controlId="email" className="p-1">
               <Form.Label className="font-weight-bold mb-1">Email</Form.Label>
               <Form.Control
-                ref={userEmailRef}
                 type="email"
                 placeholder="enter email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </Form.Group>
 

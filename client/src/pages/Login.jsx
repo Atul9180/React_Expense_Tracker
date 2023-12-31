@@ -1,7 +1,6 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-
 import { toast } from "react-toastify";
 import {
   loginWithEmailPassword,
@@ -9,25 +8,23 @@ import {
 } from "../firebase/authService";
 import { FaGoogle } from "react-icons/fa";
 import Loader from "../components/loader/Loader";
-
 import { useDispatch } from "react-redux";
 import { SetActiveUserState } from "../redux/features/userSlice";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [enteredEmail, setEnteredEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const userEmailRef = useRef();
-  const passwordRef = useRef();
-
   const emptyInputFields = () => {
-    userEmailRef.current.value = "";
-    passwordRef.current.value = "";
+    setEnteredEmail("");
+    setPassword("");
   };
 
-  //generic login:
+  // generic login
   const genericSignIn = async (callback) => {
     try {
       setIsLoading(true);
@@ -59,6 +56,7 @@ const Login = () => {
         throw new Error(result.error);
       }
     } catch (error) {
+      // console.log("error login caught");
       toast.error(error.message);
     } finally {
       setIsLoading(false);
@@ -68,8 +66,6 @@ const Login = () => {
   // signin with email password
   const handleLogin = async (e) => {
     e.preventDefault();
-    const enteredEmail = userEmailRef.current.value;
-    const password = passwordRef.current.value;
     if (!enteredEmail || !password) {
       toast.error("All fields required.");
       return;
@@ -77,7 +73,7 @@ const Login = () => {
     await genericSignIn(() => loginWithEmailPassword(enteredEmail, password));
   };
 
-  //signin with google pop up:
+  // signin with google pop up
   const signInWithGoogle = async () => {
     await genericSignIn(loginwithGoogleAccount);
   };
@@ -104,9 +100,10 @@ const Login = () => {
             <Form.Group controlId="email" className="p-1">
               <Form.Label className="font-weight-bold mb-1">Email</Form.Label>
               <Form.Control
-                ref={userEmailRef}
                 type="email"
                 placeholder="Email address"
+                value={enteredEmail}
+                onChange={(e) => setEnteredEmail(e.target.value)}
               />
             </Form.Group>
 
@@ -115,9 +112,10 @@ const Login = () => {
                 Password
               </Form.Label>
               <Form.Control
-                ref={passwordRef}
                 type="password"
                 placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </Form.Group>
             {isLoading && <Loader />}

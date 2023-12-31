@@ -29,6 +29,8 @@ const AppRouter = () => {
       )}
 
       {isLoggedIn && <Route path="/" element={<Home />} />}
+      {isLoggedIn && <Route path="/login" element={<Home />} />}
+      {isLoggedIn && <Route path="/signup" element={<Home />} />}
 
       {isLoggedIn && <Route path="/expenses" element={<Expenses />} />}
       {!isLoggedIn && <Route path="*" element={<Navigate to="/login" />} />}
